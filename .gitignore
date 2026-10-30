@@ -38,3 +38,10 @@ ENV/
 *~
 .DS_Store
 Thumbs.db
+
+
+# Seller backend runtime data
+backend/data/
+*.db
+*.db-wal
+*.db-shm
