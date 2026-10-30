@@ -182,3 +182,10 @@ In Phase 2, Claude will extend this repository to publish VERITAS on the HireCre
 4. **Builder Kit Self-Test**:
    - Validate against the HireCrew platform builder kit (`validateSellerLocalResearchResult` across all 5 benchmark cases).
    - Author `hirecrew_manifest.json` with status `ready_for_private_submission`.
+
+
+---
+
+## 7. Phase 2 Integration Notes (Claude, 2026-10-31)
+
+Phase 2 assessment found that the agent cannot yet perform research outside a few hardcoded topics (search is not implemented and several answers are pre-written). Integration is paused until those agent defects are fixed. Full findings, defect list and acceptance checks: [`docs/PHASE2_AGENT_DEFECTS.md`](PHASE2_AGENT_DEFECTS.md).
