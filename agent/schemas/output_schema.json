@@ -1,0 +1,169 @@
+{
+  "$defs": {
+    "ResearchStatus": {
+      "enum": [
+        "success",
+        "needs_clarification",
+        "failed"
+      ],
+      "title": "ResearchStatus",
+      "type": "string"
+    },
+    "SourceRecord": {
+      "description": "Structured representation of an inspected web source and its verified claims.",
+      "properties": {
+        "title": {
+          "description": "Document or webpage title.",
+          "title": "Title",
+          "type": "string"
+        },
+        "url": {
+          "description": "Exact verifiable URL inspected.",
+          "title": "Url",
+          "type": "string"
+        },
+        "publisher": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Publisher, corporate entity, or organization.",
+          "title": "Publisher"
+        },
+        "publishedAt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Reported publication or release timestamp.",
+          "title": "Publishedat"
+        },
+        "retrievedAt": {
+          "description": "UTC ISO timestamp of retrieval.",
+          "title": "Retrievedat",
+          "type": "string"
+        },
+        "relevance": {
+          "description": "Estimated thematic relevance score.",
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Relevance",
+          "type": "number"
+        },
+        "claimsSupported": {
+          "description": "List of factual claims directly backed by this source.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Claimssupported",
+          "type": "array"
+        },
+        "isPrimary": {
+          "default": false,
+          "description": "Whether this is a primary source (official doc, dataset, academic paper).",
+          "title": "Isprimary",
+          "type": "boolean"
+        },
+        "evidenceSnippet": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Verbatim textual evidence extracted from the document.",
+          "title": "Evidencesnippet"
+        }
+      },
+      "required": [
+        "title",
+        "url",
+        "retrievedAt",
+        "relevance"
+      ],
+      "title": "SourceRecord",
+      "type": "object"
+    }
+  },
+  "description": "Stable, structured output contract produced by the VERITAS research agent.",
+  "properties": {
+    "status": {
+      "$ref": "#/$defs/ResearchStatus",
+      "description": "Overall execution status: success, needs_clarification, or failed."
+    },
+    "report": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Complete Markdown research report when successful.",
+      "title": "Report"
+    },
+    "sources": {
+      "description": "Structured list of inspected sources.",
+      "items": {
+        "$ref": "#/$defs/SourceRecord"
+      },
+      "title": "Sources",
+      "type": "array"
+    },
+    "retrievedAt": {
+      "description": "UTC ISO timestamp of report completion.",
+      "title": "Retrievedat",
+      "type": "string"
+    },
+    "clarificationQuestions": {
+      "description": "Targeted clarification questions if ambiguous.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Clarificationquestions",
+      "type": "array"
+    },
+    "limitations": {
+      "description": "Documented evidence gaps, conflicting claims, or uncertainties.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    },
+    "error": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Detailed error description when status is failed.",
+      "title": "Error"
+    }
+  },
+  "required": [
+    "status",
+    "retrievedAt"
+  ],
+  "title": "ResearchReportOutput",
+  "type": "object"
+}

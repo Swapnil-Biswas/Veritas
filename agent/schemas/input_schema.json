@@ -1,0 +1,83 @@
+{
+  "$defs": {
+    "ResearchDepth": {
+      "enum": [
+        "quick",
+        "standard",
+        "exhaustive"
+      ],
+      "title": "ResearchDepth",
+      "type": "string"
+    }
+  },
+  "description": "Structured input contract accepted by the VERITAS research agent.",
+  "properties": {
+    "brief": {
+      "description": "The buyer's core research request or question.",
+      "maxLength": 50000,
+      "minLength": 5,
+      "title": "Brief",
+      "type": "string"
+    },
+    "context": {
+      "anyOf": [
+        {
+          "maxLength": 20000,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Optional background context or domain specifics.",
+      "title": "Context"
+    },
+    "constraints": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Geographic, temporal, or technological constraints.",
+      "title": "Constraints"
+    },
+    "depth": {
+      "$ref": "#/$defs/ResearchDepth",
+      "default": "standard",
+      "description": "Research depth profile: quick, standard, or exhaustive."
+    },
+    "max_sources": {
+      "default": 10,
+      "description": "Maximum number of authoritative sources to inspect.",
+      "maximum": 50,
+      "minimum": 1,
+      "title": "Max Sources",
+      "type": "integer"
+    },
+    "preferred_domains": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "description": "Optional list of authoritative domains to prioritize.",
+      "title": "Preferred Domains"
+    }
+  },
+  "required": [
+    "brief"
+  ],
+  "title": "ResearchBriefInput",
+  "type": "object"
+}
