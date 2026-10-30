@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     outcome           TEXT,
     report            TEXT,
     sources_json      TEXT,
+    source_details_json TEXT,
     limitations_json  TEXT,
     clarification_json TEXT,
     retrieved_at      TEXT,
@@ -202,6 +203,7 @@ class JobStore:
         outcome: str,
         report: str,
         sources: List[Dict[str, Any]],
+        source_details: List[Dict[str, Any]],
         limitations: List[str],
         clarification_questions: List[str],
         retrieved_at: str,
@@ -210,18 +212,24 @@ class JobStore:
     ) -> None:
         self._finish(
             job_id, lease_token,
-            "status='delivered', outcome=?, report=?, sources_json=?, limitations_json=?, "
+            "status='delivered', outcome=?, report=?, sources_json=?, source_details_json=?, limitations_json=?, "
             "clarification_json=?, retrieved_at=?, agent_id=?, agent_version=?, "
             "error_code=NULL, error_message=NULL, finished_at=?",
-            (outcome, report, json.dumps(sources), json.dumps(limitations),
+            (outcome, report, json.dumps(sources), json.dumps(source_details), json.dumps(limitations),
              json.dumps(clarification_questions), retrieved_at, agent_id, agent_version, _now_iso()),
         )
 
-    def mark_failed(self, job_id: str, lease_token: str, *, code: str, message: str) -> None:
+    def mark_failed(
+        self, job_id: str, lease_token: str, *, code: str, message: str,
+        limitations: Optional[List[str]] = None, clarification_questions: Optional[List[str]] = None,
+        agent_id: Optional[str] = None, agent_version: Optional[str] = None,
+    ) -> None:
         self._finish(
             job_id, lease_token,
-            "status='failed', error_code=?, error_message=?, finished_at=?",
-            (code, message, _now_iso()),
+            "status='failed', error_code=?, error_message=?, limitations_json=?, clarification_json=?, "
+            "agent_id=?, agent_version=?, finished_at=?",
+            (code, message, json.dumps(limitations or []), json.dumps(clarification_questions or []),
+             agent_id, agent_version, _now_iso()),
         )
 
     def schedule_retry(self, job_id: str, lease_token: str, *, code: str, message: str, delay_seconds: float) -> None:
