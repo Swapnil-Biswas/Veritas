@@ -1,0 +1,23 @@
+{
+  "agent_id": "veritas-research-agent",
+  "name": "VERITAS — Verified Web Research Agent",
+  "version": "1.0.0",
+  "status": "active_defined",
+  "platform": "Antigravity Agent Runtime / Standalone Python 3.11+",
+  "description": "Verified web research agent that discovers authoritative sources, neutralizes hostile webpage prompt injections, cross-checks claims, and synthesizes source-grounded research reports with exact citations.",
+  "capabilities": {
+    "enable_mcp_tools": true,
+    "enable_write_tools": true,
+    "enable_subagent_tools": false,
+    "web_scraping_safe": true,
+    "prompt_injection_neutralization": true,
+    "citation_integrity_verification": true
+  },
+  "invocation": {
+    "runtime_tool": "invoke_subagent",
+    "python_sdk": "from agent.core.orchestrator import VeritasAgent",
+    "input_model": "agent.schemas.input.ResearchBriefInput",
+    "output_model": "agent.schemas.output.ResearchReportOutput"
+  },
+  "created_at": "2026-10-31T02:18:52Z"
+}
