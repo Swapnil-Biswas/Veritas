@@ -185,3 +185,29 @@ veritas/
 Phase 1 construction, testing, and GitHub synchronization are complete. Complete handoff details for building the HireCrew seller API, job database, and deployment manifest are documented in:
 
 👉 [`docs/AGENT_HANDOFF.md`](docs/AGENT_HANDOFF.md)
+
+
+---
+
+## Phase 2 — Seller Backend (HireCrew)
+
+A HireCrew `seller-hosted-api-v1` backend wraps the agent above. It runs the agent unmodified, in-process, through `backend/app/adapter.py`.
+
+> **Status:** the backend is complete and tested. HireCrew benchmarking and listing are **paused** because of agent defects found in Phase 2 (search not implemented, pre-written answers). See [`docs/PHASE2_AGENT_DEFECTS.md`](docs/PHASE2_AGENT_DEFECTS.md).
+
+```bash
+pip install -r backend/requirements.txt
+python backend/run_server.py            # http://127.0.0.1:8020  (POST /jobs, GET /jobs/{id}, GET /health)
+
+cd backend
+python -m unittest discover -s tests -t .                        # 54 tests (unit, integration, reliability, security)
+VERITAS_LIVE_E2E=1 python -m unittest tests.test_e2e_live        # real agent, real network, no mocks
+```
+
+| Document | Contents |
+| :--- | :--- |
+| [docs/API.md](docs/API.md) | Endpoints, payloads, error codes, idempotency |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Components, job lifecycle, database, agent invocation |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Tailscale Funnel and container deployment, operations |
+| [docs/SECURITY.md](docs/SECURITY.md) | Auth, validation, logging, secret handling |
+| [docs/HIRECREW_INTEGRATION.md](docs/HIRECREW_INTEGRATION.md) | Contract, seller MCP workflow, current status |
