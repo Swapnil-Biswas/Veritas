@@ -1,0 +1,187 @@
+# VERITAS
+## Verified Web Research Agent (Phase 1)
+### Source-Grounded Intelligence for the HireCrew Marketplace
+
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/)
+[![Pydantic](https://img.shields.io/badge/Pydantic-v2-e92063.svg)](https://docs.pydantic.dev/)
+[![Status](https://img.shields.io/badge/Status-Handoff%20Ready-success.svg)](#claude-phase-2-handoff)
+[![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
+
+VERITAS is an autonomous research agent engineered for the **HireCrew Marketplace** (`https://hirecrew.si`). It accepts a buyer's research brief, investigates the subject using publicly verifiable web evidence, rigorously assesses the reliability and provenance of information, and synthesizes a concise, source-grounded research report.
+
+---
+
+## The Central Axiom
+
+> **EVERY MATERIAL FACTUAL CLAIM MUST BE SUPPORTED BY IDENTIFIABLE EVIDENCE.**  
+> **VERITAS MUST NEVER INVENT FACTS, SOURCES, QUOTATIONS, STATISTICS, DATES, OR URLS.**
+
+---
+
+## Research Workflow Architecture
+
+VERITAS executes a structured 8-stage research process:
+
+1. **Stage 1 — Brief Interpretation & Ambiguity Audit**:
+   - Parses the request, extracting entities, technical requirements, and constraints.
+   - Detects ambiguous briefs (e.g. *"Compare it"*) and halts with `status="needs_clarification"` rather than guessing.
+2. **Stage 2 — Research Planning**:
+   - Decomposes the research request into targeted sub-inquiries.
+   - Targets primary vendor docs, peer-reviewed ArXiv papers, and official specifications.
+3. **Stage 3 — Source Discovery**:
+   - Queries web search engines, filtering out link farms and SEO blogs.
+   - Flags primary authority domains (`arxiv.org`, `openai.com`, `docs.github.com`, `nodejs.org`).
+4. **Stage 4 — Secure Evidence Extraction**:
+   - Fetches full webpage text while rejecting private subnets / cloud metadata (SSRF defense).
+   - Excises HTML comments and neutralizes indirect prompt injections (e.g. `SYSTEM OVERRIDE`).
+   - Wraps external content in defensive `[UNTRUSTED DATA]` containers.
+5. **Stage 5 — Verification & Conflict Analysis**:
+   - Cross-checks factual claims across independent sources.
+   - Flags discrepancies, explains what each source asserts, and explicitly logs evidence gaps.
+6. **Stage 6 — Report Synthesis**:
+   - Formulates the mandatory 6-section report structure with Markdown comparison tables.
+7. **Stage 7 — Quality Assurance & Citation Audit**:
+   - Verifies that every citation URL appears in inspected source records with exact links.
+8. **Stage 8 — Structured Output Delivery**:
+   - Emits a typed `ResearchReportOutput` JSON schema.
+
+---
+
+## Mandatory Report Format
+
+Every completed research report conforms to the following standardized structure:
+
+```markdown
+# Research Report: [Topic]
+
+**Research date:** [UTC timestamp]
+**Research scope:** [Brief description]
+
+## 1. Executive Summary
+A concise direct answer to the buyer's request.
+
+## 2. Key Findings
+Evidence-backed findings, with exact source URLs beside material claims.
+
+## 3. Detailed Analysis
+Relevant explanation, comparisons, supporting evidence, and trade-offs.
+
+## 4. Comparison
+(Structured Markdown table when comparing options or systems).
+
+## 5. Limitations and Uncertainties
+Clearly identifies missing, conflicting, outdated, or inconclusive evidence.
+
+## 6. Conclusion
+A direct conclusion based on the available evidence.
+
+## Sources
+Numbered list of verified sources with Title, Publisher, Exact URL, and UTC Retrieval Date.
+```
+
+---
+
+## Quickstart & Invocation
+
+### 1. Installation
+```bash
+git clone https://github.com/Swapnil-Biswas/Veritas.git
+cd Veritas
+pip install -r requirements.txt
+```
+
+### 2. Python Invocation Example
+```python
+import asyncio
+from agent.schemas.input import ResearchBriefInput, ResearchDepth
+from agent.core.orchestrator import VeritasAgent
+
+async def main():
+    agent = VeritasAgent()
+    brief_input = ResearchBriefInput(
+        brief="Compare GitHub Actions, GitLab CI/CD, and CircleCI for self-hosted runners.",
+        depth=ResearchDepth.STANDARD
+    )
+    result = await agent.run(brief_input)
+
+    print("Execution Status:", result.status)
+    print("\nReport Markdown:\n", result.report)
+    print("\nInspected Sources:", len(result.sources))
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+---
+
+## Running Verification Tests
+
+VERITAS includes 10 automated unit, security, and reliability tests:
+
+```bash
+# Run all tests
+python -m unittest discover tests
+
+# Or run specific test suites
+python -m unittest tests/agent/test_functional.py
+python -m unittest tests/agent/test_security.py
+python -m unittest tests/agent/test_reliability.py
+```
+
+### Test Coverage Highlights
+- ✅ **Multi-Source CI/CD Comparison**: Verifies 6-section structure, comparison table, and exact in-line citations.
+- ✅ **Time-Sensitive Fact-Checking**: Verifies Node.js Active LTS temporal schedule without extrapolation.
+- ✅ **Ambiguous Brief Handling**: Verifies that under-specified requests emit targeted clarification questions.
+- ✅ **SSRF Barrier**: Validates rejection of `169.254.169.254`, `127.0.0.1`, and private RFC 1918 subnets.
+- ✅ **Prompt-Injection Neutralization**: Verifies that embedded commands (e.g. `<!-- SYSTEM OVERRIDE -->`) are stripped and flagged as untrusted data.
+- ✅ **Sparse Evidence & Inaccessible Page Recovery**: Verifies honest reporting of evidence gaps without crashing on 404/500 errors.
+
+---
+
+## Repository Structure
+
+```
+veritas/
+├── agent/
+│   ├── core/
+│   │   ├── orchestrator.py        # VeritasAgent multi-stage research coordinator
+│   │   ├── evidence_verifier.py   # Claim extraction, conflict analysis, and evidence gap tracker
+│   │   └── report_builder.py      # Mandatory 6-section report assembler & citation auditor
+│   ├── prompts/
+│   │   ├── system.py              # Master VERITAS system prompt & non-negotiable rules
+│   │   └── workflow_prompts.py    # Brief interpretation, planning, and evaluation templates
+│   ├── schemas/
+│   │   ├── input.py               # ResearchBriefInput schema
+│   │   ├── output.py              # ResearchReportOutput schema
+│   │   ├── source.py              # SourceRecord & citation schema
+│   │   ├── input_schema.json      # Machine-readable JSON input schema
+│   │   └── output_schema.json     # Machine-readable JSON output schema
+│   ├── tools/
+│   │   ├── security_barrier.py    # SSRF validator & prompt injection sanitizer
+│   │   ├── web_scraper.py         # Async HTTP scraper with reader extraction
+│   │   └── search_engine.py       # Source discovery engine targeting primary authority domains
+│   ├── workflows/
+│   │   └── state.py               # ResearchState telemetry ledger and state machine
+│   └── agent_manifest.json        # Subagent registration & capability manifest
+├── tests/
+│   └── agent/
+│       ├── test_functional.py     # Multi-source, temporal, and citation tests
+│       ├── test_security.py       # SSRF, HTML comment, and indirect prompt injection tests
+│       └── test_reliability.py    # Inaccessible URLs and sparse evidence tests
+├── docs/
+│   ├── AGENT_HANDOFF.md           # Comprehensive Claude Phase 2 handoff specification
+│   ├── architecture/
+│   │   ├── RESEARCH_WORKFLOW.md   # State machine, pipeline diagram, and stages
+│   │   └── EVIDENCE_MODEL.md      # Authority hierarchy and conflict handling protocols
+├── .env.example                   # Environment configuration template
+├── .gitignore                     # Git ignore rules
+└── requirements.txt               # Production Python dependencies
+```
+
+---
+
+## Claude Phase 2 Handoff
+
+Phase 1 construction, testing, and GitHub synchronization are complete. Complete handoff details for building the HireCrew seller API, job database, and deployment manifest are documented in:
+
+👉 [`docs/AGENT_HANDOFF.md`](docs/AGENT_HANDOFF.md)
