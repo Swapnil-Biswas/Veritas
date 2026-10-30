@@ -1,0 +1,4 @@
+# Seller backend (the agent's own dependencies are in ../requirements.txt)
+-r ../requirements.txt
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
