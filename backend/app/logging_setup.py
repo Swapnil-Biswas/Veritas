@@ -12,8 +12,8 @@ import re
 
 _PATTERNS = [
     re.compile(r"(?i)(bearer\s+)[A-Za-z0-9._~+/=-]{8,}"),
-    re.compile(r"(?i)((?:api[_-]?key|token|secret|password)\s*[=:]\s*)\S+"),
-    re.compile(r"\b(sk|pk|ghp|gho|hf)_[A-Za-z0-9]{16,}\b"),
+    re.compile(r"(?i)((?:api[_-]?key|key|token|secret|password)\s*[=:]\s*)\S+"),
+    re.compile(r"\b(?:sk|pk|rk|ghp|gho|ghs|hf|xox[abp])[_-][A-Za-z0-9_-]{16,}"),
 ]
 
 
