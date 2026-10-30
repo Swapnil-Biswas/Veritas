@@ -28,7 +28,8 @@ from urllib.parse import urlparse
 
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if _REPO_ROOT not in sys.path:
-    sys.path.insert(0, _REPO_ROOT)
+    # Appended (not prepended) so the repo-root `tests/` package never shadows backend modules.
+    sys.path.append(_REPO_ROOT)
 
 from agent.core.orchestrator import VeritasAgent  # noqa: E402
 from agent.schemas.input import ResearchBriefInput, ResearchDepth  # noqa: E402
