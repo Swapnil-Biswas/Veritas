@@ -33,7 +33,7 @@ class TestWorker(unittest.TestCase):
         row = store.get(job_id)
         self.assertEqual(row["status"], "delivered")
         self.assertIn("https://example.org/doc", row["sources_json"])
-        self.assertEqual(row["agent_version"], "1.0.0")
+        self.assertEqual(row["agent_version"], "1.1.0")
 
     def test_transient_failure_is_retried_then_delivered(self):
         runner = ScriptedRunner(RuntimeError("network blip"), success_output())

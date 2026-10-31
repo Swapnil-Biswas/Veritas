@@ -158,7 +158,7 @@ class TestPolling(ApiTestCase):
         self.assertTrue(body["report"].startswith("# Report"))
         self.assertEqual(body["sources"], [{"title": "Example doc", "url": "https://example.org/doc"}])
         self.assertEqual(body["retrievedAt"], "2026-10-31T00:00:00+00:00")
-        self.assertEqual(body["agent"], {"id": "veritas-research-agent", "version": "1.0.0"})
+        self.assertEqual(body["agent"], {"id": "veritas-research-agent", "version": "1.1.0"})
 
     def test_failed_job_response_shape(self):
         job_id = self.submit().json()["jobId"]

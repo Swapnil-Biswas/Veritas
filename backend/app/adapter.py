@@ -154,6 +154,12 @@ class VeritasAgentAdapter:
             raise ClarificationRequired(questions, list(output.limitations))
 
         if output.status == ResearchStatus.FAILED:
+            if output.error == "NO_EVIDENCE_RETRIEVED":
+                raise AgentOutputInvalid(
+                    "agent retrieved no evidence",
+                    code="NO_EVIDENCE_RETRIEVED",
+                    public_message="No public evidence could be retrieved for this brief, so no report was delivered.",
+                )
             raise AgentReportedFailure("agent reported status=failed")
 
         if not output.report or not output.report.strip():

@@ -27,7 +27,7 @@ class TestAdapter(unittest.TestCase):
         self.assertEqual(r.source_details[0]["evidenceSnippet"], "snippet")
         self.assertEqual(r.limitations, ["gap A"])
         self.assertEqual(r.retrieved_at, out.retrievedAt)
-        self.assertEqual((r.agent_id, r.agent_version), ("veritas-research-agent", "1.0.0"))
+        self.assertEqual((r.agent_id, r.agent_version), ("veritas-research-agent", "1.1.0"))
 
     def test_input_mapping_uses_agent_schema(self):
         seen = {}
@@ -84,6 +84,13 @@ class TestAdapter(unittest.TestCase):
         with self.assertRaises(AgentOutputInvalid) as ctx:
             run(self.adapter(runner_returning(success_output(sources=[]))))
         self.assertEqual(ctx.exception.code, "NO_EVIDENCE_RETRIEVED")
+
+    def test_agent_no_evidence_failure_maps_to_no_evidence_code(self):
+        out = ResearchReportOutput(status=ResearchStatus.FAILED, retrievedAt="t", error="NO_EVIDENCE_RETRIEVED")
+        with self.assertRaises(AgentOutputInvalid) as ctx:
+            run(self.adapter(runner_returning(out)))
+        self.assertEqual(ctx.exception.code, "NO_EVIDENCE_RETRIEVED")
+        self.assertFalse(ctx.exception.retryable)
 
     def test_non_http_source_url_is_invalid(self):
         with self.assertRaises(AgentOutputInvalid):
