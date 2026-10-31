@@ -91,14 +91,7 @@ class EvidenceVerifier:
             if t_low not in all_text:
                 evidence_gaps.append(f"No authoritative evidence found directly addressing: '{topic}'.")
 
-        # Temporal / Quantitative conflict checks (e.g. Node LTS status or release years)
-        if "node" in all_text and ("18" in all_text or "20" in all_text or "22" in all_text):
-            # Check if sources disagree on active LTS
-            claims_about_lts = [c for c in claims if "lts" in c.claim.lower()]
-            if len(claims_about_lts) >= 2:
-                # If claims reference different versions as active
-                pass
-
+        # Cross-source conflicts are reported by the synthesis stage, which sees the full evidence text.
         return conflicts, evidence_gaps
 
     @staticmethod
@@ -135,3 +128,4 @@ class EvidenceVerifier:
             )
 
         return records
+

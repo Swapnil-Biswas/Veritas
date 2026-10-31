@@ -78,6 +78,45 @@ class ReportBuilder:
         return "\n".join(lines)
 
     @staticmethod
+    def format_grounded_report(
+        topic: str,
+        scope: str,
+        body: str,
+        limitations: List[str],
+        clarification_questions: List[str],
+        sources: List[SourceRecord],
+        retrieval_date_utc: str
+    ) -> str:
+        """Wraps a synthesized, inline-cited report body with the date, scope, limitations and source list."""
+        lines: List[str] = [
+            f"# Research Report: {topic}\n",
+            f"**Retrieval date (UTC):** {retrieval_date_utc}  ",
+            f"**Evidence inspected:** {scope}\n",
+            body.strip(),
+            "",
+        ]
+        if clarification_questions:
+            lines.append("## Questions That Would Sharpen This Answer")
+            lines.extend(f"- {q}" for q in clarification_questions)
+            lines.append("")
+        lines.append("## Limitations and Uncertainties")
+        if limitations:
+            lines.extend(f"- {lim}" for lim in limitations)
+        else:
+            lines.append("- None beyond the scope of the sources listed below.")
+        lines.append("")
+        lines.append("## Sources")
+        for idx, src in enumerate(sources, 1):
+            publisher_info = f" ({src.publisher})" if src.publisher else ""
+            pub_info = f" • Published: {src.publishedAt}" if src.publishedAt else ""
+            lines.append(
+                f"{idx}. **{src.title}**{publisher_info}\n"
+                f"   - URL: {src.url}\n"
+                f"   - Retrieved: {src.retrievedAt}{pub_info}"
+            )
+        return "\n".join(lines)
+
+    @staticmethod
     def audit_citation_integrity(report_markdown: str, sources: List[SourceRecord]) -> Tuple[bool, List[str]]:
         """
         Guarantees that every source listed in the Sources section is actually referenced in the report text,
@@ -89,3 +128,4 @@ class ReportBuilder:
                 findings.append(f"Source URL '{src.url}' declared in sources array but uncited in report body.")
 
         return len(findings) == 0, findings
+
