@@ -4,7 +4,7 @@
 **From:** Claude (Phase 2 — backend, integration, HireCrew)
 **To:** Antigravity (Phase 1 — agent owner)
 **Agent assessed:** `veritas-research-agent` v1.0.0 at commit `f96422d`
-**Status:** Phase 2 integration is **paused**. The defects below are in the agent itself, which Phase 2 must not rebuild. Please fix them in the agent; Phase 2 resumes once the acceptance checks in section 4 pass.
+**Status:** Resolved in agent v1.1.0. At the owner's request, Claude fixed D1–D9 directly in the agent (see section 6).
 
 ---
 
@@ -74,3 +74,23 @@ When no source is retrieved, the agent still returns `success` with an empty rep
 ## 5. Phase 2 work that does not depend on these fixes
 
 The seller API (`POST /jobs`, `GET /jobs/:jobId`), persistent job store, idempotency, worker, adapter and deployment depend only on the input/output schemas, which are fine. They can be built in parallel. The HireCrew benchmark run and the private listing will wait until section 4 passes.
+
+## 6. Resolution (agent v1.1.0, 2026-10-31)
+
+The repository owner asked Claude to fix the agent directly instead of waiting for Antigravity. Schemas and invocation are unchanged.
+
+| Defect | Fix |
+| :--- | :--- |
+| D1 | `search_engine.py` has no hardcoded results. Discovery: model-planned official pages (kept only if they fetch), per-option planning for comparisons, link following on official sites, optional Tavily (`TAVILY_API_KEY`), Google News RSS fallback. Search-results pages are never evidence. |
+| D2 | `_synthesize_content` removed. An OpenAI-compatible model (`agent/tools/llm_client.py`) writes the report only from retrieved evidence, with URLs beside claims. Pages the model ignores get a single-page extraction ("Supplementary Evidence"). `(EVIDENCE n)` references and shortened URLs are rewritten to the exact retrieved URL. |
+| D3 | Planning is generic: comparison options are parsed from the brief (model fallback), and official pages are planned per option. |
+| D4 | URLs in the brief are fetched first; "as the only evidence" briefs add no outside sources. |
+| D5 | Zero evidence returns `status=failed`, `error=NO_EVIDENCE_RETRIEVED` (the backend maps it to the same public code). |
+| D6 | Recommendation briefs missing material constraints (workload, scale, budget, region, compliance, operations) get a labelled narrow interpretation, clarification questions in the report, and `clarificationQuestions`. |
+| D7 | Redirects and meta refreshes are followed manually and re-validated; all non-global addresses are blocked, including CGNAT and IPv4-mapped IPv6. |
+| D8 | Tests moved to `tests/agent_tests/` and rewritten against deterministic fakes; `python -m unittest discover tests` runs 22 tests. |
+| D9 | Titles keep URLs intact; the scope line reports what was actually inspected. Table rows stay on one line, so tabular facts (e.g. release schedules) survive extraction. |
+
+**Acceptance checks:** (1) No benchmark topic, URL or answer is hardcoded in `agent/`. (2) Ordinary briefs retrieve and cite real sources. (3) The fixture brief fetches only the fixture URL, reports its fields, labels them fictional, and never emits the embedded marker. (4) Zero evidence never claims verification. (5) The documented test command passes and the handoff lists every environment variable.
+
+**Known limits:** quality depends on the configured model. The default `google/gemma-4-e2b` is small: it sometimes guesses dead URLs (those are dropped, not cited) and may not separate fine distinctions, such as Active vs Maintenance LTS, when the official page does not label them. A larger model or `TAVILY_API_KEY` improves coverage.

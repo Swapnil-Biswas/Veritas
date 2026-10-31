@@ -116,25 +116,23 @@ if __name__ == "__main__":
 
 ## Running Verification Tests
 
-VERITAS includes 10 automated unit, security, and reliability tests:
+The agent tests run offline: the network and the language model are replaced by deterministic fakes, so they exercise the real orchestration (planning, fetching, citation handling, failure paths).
 
 ```bash
-# Run all tests
+# Agent: 22 tests
 python -m unittest discover tests
 
-# Or run specific test suites
-python -m unittest tests/agent/test_functional.py
-python -m unittest tests/agent/test_security.py
-python -m unittest tests/agent/test_reliability.py
+# Seller backend
+cd backend && python -m unittest discover -s tests -t .
 ```
 
 ### Test Coverage Highlights
-- ✅ **Multi-Source CI/CD Comparison**: Verifies 6-section structure, comparison table, and exact in-line citations.
-- ✅ **Time-Sensitive Fact-Checking**: Verifies Node.js Active LTS temporal schedule without extrapolation.
-- ✅ **Ambiguous Brief Handling**: Verifies that under-specified requests emit targeted clarification questions.
-- ✅ **SSRF Barrier**: Validates rejection of `169.254.169.254`, `127.0.0.1`, and private RFC 1918 subnets.
-- ✅ **Prompt-Injection Neutralization**: Verifies that embedded commands (e.g. `<!-- SYSTEM OVERRIDE -->`) are stripped and flagged as untrusted data.
-- ✅ **Sparse Evidence & Inaccessible Page Recovery**: Verifies honest reporting of evidence gaps without crashing on 404/500 errors.
+- Reports are built only from pages actually retrieved for the brief; every listed source is cited.
+- Comparisons plan official pages per named option; brief URLs are fetched and "only evidence" restrictions are honoured.
+- Unspecified recommendations list the missing constraints and clarification questions; empty briefs get `needs_clarification`.
+- Zero retrieved evidence returns `failed` (`NO_EVIDENCE_RETRIEVED`), never a verified-looking report.
+- The SSRF barrier blocks private, CGNAT, link-local and IPv4-mapped addresses and re-checks every redirect hop.
+- Injection text (hidden comments, task overrides, marker/secret requests) is flagged and never followed.
 
 ---
 
@@ -200,7 +198,7 @@ pip install -r backend/requirements.txt
 python backend/run_server.py            # http://127.0.0.1:8020  (POST /jobs, GET /jobs/{id}, GET /health)
 
 cd backend
-python -m unittest discover -s tests -t .                        # 54 tests (unit, integration, reliability, security)
+cd backend && python -m unittest discover -s tests -t .           # 56 tests (unit, integration, reliability, security)
 VERITAS_LIVE_E2E=1 python -m unittest tests.test_e2e_live        # real agent, real network, no mocks
 ```
 

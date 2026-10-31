@@ -136,16 +136,65 @@ Install via `pip install -r requirements.txt`:
 - `pytz>=2024.1`
 
 ### Environment Variables
-Configure in `.env`:
-- `VERITAS_ENV`: `production` or `development`
-- `VERITAS_USER_AGENT`: Custom identification user agent
-- `VERITAS_REQUEST_TIMEOUT`: Default `15.0` seconds
-- Optional LLM API Keys (if enhancing Stage 6 synthesis beyond deterministic extractor):
-  - `GEMINI_API_KEY`, `OPENAI_API_KEY`, or `ANTHROPIC_API_KEY`
+- `VERITAS_LLM_ENDPOINT` (default `http://127.0.0.1:1234/v1`), `VERITAS_LLM_MODEL` (default `google/gemma-4-e2b`), `VERITAS_LLM_API_KEY` (optional), `VERITAS_LLM_TIMEOUT_SECONDS` (default 240): OpenAI-compatible chat model used for planning and synthesis. **Required at runtime**; if it is unreachable the agent raises `LLMUnavailable` and the backend retries the job.
+- `VERITAS_EVIDENCE_CHAR_BUDGET` (default 12000), `VERITAS_PER_PAGE_CHARS` (default 3500): evidence sent to the model.
+- `TAVILY_API_KEY` (optional, paid per query): enables Tavily web search. Without it, discovery is model-planned official pages (verified by fetching), link following on official sites, and Google News RSS. No key is ever placed in a URL.
 
 ### Network & Security
 - Outbound HTTPS (port 443) access to public research domains.
-- Internal SSRF protection automatically prevents connection to private IP ranges (`10.0.0.0/8`, `192.168.0.0/16`, `127.0.0.0/8`, `169.254.169.254`).
+- SSRF protection blocks every non-global address (private, loopback, link-local, CGNAT `100.64.0.0/10`, IPv4-mapped IPv6) and re-validates each redirect hop and meta refresh.
+
+---
+
+## 5. Verified Test Suite Summary
+
+`python -m unittest discover tests` runs 22 offline agent tests (functional, reliability, security) in `tests/agent_tests/` (renamed from `tests/agent/`, which shadowed the `agent` package). See `docs/PHASE2_AGENT_DEFECTS.md` section 6 for the v1.1.0 changes.
+
+---
+
+## 6. Conclusion\nProduction enterprise deployments should target Active LTS releases...\n\n## Sources\n1. **Node.js Release Schedule and Active LTS Status**\n   - URL: https://nodejs.org/en/about/previous-releases\n   - Retrieved: 2026-10-31T02:19:40.123456+00:00\n",
+  "sources": [
+    {
+      "title": "Node.js Release Schedule and Active LTS Status",
+      "url": "https://nodejs.org/en/about/previous-releases",
+      "publisher": "Node.js Foundation",
+      "publishedAt": null,
+      "retrievedAt": "2026-10-31T02:19:40.123456+00:00",
+      "relevance": 0.9,
+      "claimsSupported": [
+        "Node.js release schedule designates even-numbered versions as Long Term Support (LTS)..."
+      ],
+      "isPrimary": true,
+      "evidenceSnippet": "Node.js release schedule designates even-numbered versions..."
+    }
+  ],
+  "retrievedAt": "2026-10-31T02:19:40.543210+00:00",
+  "clarificationQuestions": [],
+  "limitations": [],
+  "error": null
+}
+```
+
+---
+
+## 4. Integration & Environment Requirements
+
+### Dependencies
+Install via `pip install -r requirements.txt`:
+- `pydantic>=2.10.0`
+- `httpx>=0.28.0`
+- `beautifulsoup4>=4.12.0`
+- `python-dateutil>=2.9.0`
+- `pytz>=2024.1`
+
+### Environment Variables
+- `VERITAS_LLM_ENDPOINT` (default `http://127.0.0.1:1234/v1`), `VERITAS_LLM_MODEL` (default `google/gemma-4-e2b`), `VERITAS_LLM_API_KEY` (optional), `VERITAS_LLM_TIMEOUT_SECONDS` (default 240): OpenAI-compatible chat model used for planning and synthesis. **Required at runtime**; if it is unreachable the agent raises `LLMUnavailable` and the backend retries the job.
+- `VERITAS_EVIDENCE_CHAR_BUDGET` (default 12000), `VERITAS_PER_PAGE_CHARS` (default 3500): evidence sent to the model.
+- `TAVILY_API_KEY` (optional, paid per query): enables Tavily web search. Without it, discovery is model-planned official pages (verified by fetching), link following on official sites, and Google News RSS. No key is ever placed in a URL.
+
+### Network & Security
+- Outbound HTTPS (port 443) access to public research domains.
+- SSRF protection blocks every non-global address (private, loopback, link-local, CGNAT `100.64.0.0/10`, IPv4-mapped IPv6) and re-validates each redirect hop and meta refresh.
 
 ---
 

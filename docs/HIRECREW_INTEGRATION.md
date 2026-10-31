@@ -21,7 +21,7 @@ Tools exposed by the installed kit, as listed by `tools/list`: `get_submission_g
 | :--- | :--- |
 | Seller API, persistence, idempotency, worker, adapter | Done; 54 backend tests + live end-to-end test passing |
 | Public HTTPS endpoint | Pending: needs the owner's Tailscale Funnel command (DEPLOYMENT.md, Option A) |
-| Benchmark run (`get_research_benchmark_pack` → five briefs → `check_local_research_result`) | **Blocked** on agent defects D1–D6 ([PHASE2_AGENT_DEFECTS.md](PHASE2_AGENT_DEFECTS.md)). Running the benchmark now would only exercise hardcoded answers. |
+| Benchmark run (`get_research_benchmark_pack` → five briefs through `POST /jobs` → `check_local_research_result`) | Done with agent v1.1.0 on 2026-10-31: all five cases `delivered` and `structural_pass` with no findings; `validate_deployment_manifest` returned `ready_for_private_submission`. A local structural pass is not a HireCrew approval. |
 | Private listing | Not created; waits for the benchmark |
 
 No HireCrew approval or certification has been granted. A local `structural_pass` from the kit is developer feedback, not a marketplace score.
