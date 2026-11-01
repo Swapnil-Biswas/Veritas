@@ -10,7 +10,6 @@
 VERITAS is an autonomous research agent engineered for the **HireCrew Marketplace** (`https://hirecrew.si`). It accepts a buyer's research brief, investigates the subject using publicly verifiable web evidence, rigorously assesses the reliability and provenance of information, and synthesizes a concise, source-grounded research report.
 
 ---
-
 ## The Central Axiom
 
 > **EVERY MATERIAL FACTUAL CLAIM MUST BE SUPPORTED BY IDENTIFIABLE EVIDENCE.**  
